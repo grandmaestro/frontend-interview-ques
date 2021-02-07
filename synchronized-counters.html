@@ -1,0 +1,96 @@
+<!-- 
+  Problem Statement: 
+
+  Implement 3 counters which have different count limit of their own but should start together and should end together
+ -->
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width">
+    <title>JS Bin</title>
+  </head>
+
+  <body>
+    <div id="counter1">0</div>
+    <div id="counter2">0</div>
+    <div id="counter3">0</div>
+    <button onclick="toggleCounter()"> Hit Me ! </button>
+  </body>
+  <script>
+
+    function setCounterInDom(counter, selector) {
+      document.querySelectorAll(selector)[0].innerText = counter;
+    }
+
+    const counterState = {
+      1: {
+        count: 0,
+        interval: null,
+        limit: 100,
+        selector: '#counter1'
+      },
+      2: {
+        count: 0,
+        interval: null,
+        limit: 5000,
+        selector: '#counter2'
+      },
+      3: {
+        count: 0,
+        interval: null,
+        limit: 30000,
+        selector: '#counter3'
+      }
+
+    }
+
+    function toggleCounter() {
+      const incCount = (state) => { state.count = state.count + 1; };
+      // Start Counter 
+      const evalCounter = function (state) {
+        console.log(state);
+        if (!state.interval) {
+          state.interval = setInterval(() => {
+            if (state.count < state.limit) {
+              incCount(state);
+              setCounterInDom(state.count, state.selector);
+            } else {
+              clearInterval(state.interval)
+            }
+          }, state.skipInterval);
+
+        } else {
+          // Reset the counter
+          clearInterval(state.interval);
+          counterState.interval = null;
+          counterState.count = 0;
+          setCounterInDom(state.count, state.selector);
+
+        }
+      }
+
+      const normalizeExecutionTime = function () {
+        const mutatedStates = Object.assign({}, counterState);
+        let maxLimit = -1;
+        for (let counter in mutatedStates) {
+          maxLimit = Math.max(maxLimit, mutatedStates[counter].limit);
+        }
+        // 1000ms
+        for (let counter in mutatedStates) {
+          mutatedStates[counter].skipInterval = (maxLimit / mutatedStates[counter].limit) * 10;
+        }
+
+        return mutatedStates;
+      }
+      const newState = normalizeExecutionTime();
+      console.log(newState);
+      evalCounter(newState[1]);
+      evalCounter(newState[2]);
+      evalCounter(newState[3]);
+    }
+  </script>
+
+</html>
